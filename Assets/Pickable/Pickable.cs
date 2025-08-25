@@ -12,12 +12,12 @@ public class Pickable : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.CompareTag("Player")) {
-           Debug.Log("Pickup :" + PickableType);
+        //    Debug.Log("Pickup :" + PickableType);
             if (OnPicked != null)
             {
                 OnPicked(this);
             }
-            // Destroy(gameObject);
+            Destroy(gameObject);
         }
     }
 }
