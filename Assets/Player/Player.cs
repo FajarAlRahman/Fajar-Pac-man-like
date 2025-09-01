@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using TMPro;
 
 public class Player : MonoBehaviour
 {
@@ -11,15 +12,35 @@ public class Player : MonoBehaviour
     [SerializeField] private float _speed;
     [SerializeField] private Camera _camera;
     [SerializeField] private float _powerUpDuration;
+    [SerializeField] private int _health;
+    [SerializeField] private TMP_Text _healthText;
+    [SerializeField] private Transform _respawnPoint;
 
     private Coroutine _powerUpCoroutine;
     private Rigidbody _rigidbody;
+    private bool _isPoweredUpActive = false;
+
+    public void Dead()
+    {
+        _health -= 1;
+        if (_health > 0)
+        {
+            transform.position = _respawnPoint.position;
+        }
+        else
+        {
+            _health = 0;
+            Debug.Log("Lose");
+        }
+        UpdateUI();
+    }
 
     /// Initializes the player
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
         HideAndLockCursor();
+        UpdateUI();
     }
 
     /// Hides and locks the cursor
@@ -51,21 +72,40 @@ public class Player : MonoBehaviour
         {
             StopCoroutine(_powerUpCoroutine);
         }
-
         _powerUpCoroutine = StartCoroutine(StartPowerUp());
     }
 
     /// Starts the power-up effect
     private IEnumerator StartPowerUp()
     {
+        _isPoweredUpActive = true;
         if (OnPowerUpStart != null)
         {
             OnPowerUpStart();
         }
         yield return new WaitForSeconds(_powerUpDuration);
+        _isPoweredUpActive = false;
         if (OnPowerUpStop != null)
         {
             OnPowerUpStop();
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (_isPoweredUpActive)
+        {
+            if (collision.gameObject.CompareTag("Enemy"))
+            {
+                collision.gameObject.GetComponent<Enemy>().Dead();
+            }
+
+        }
+    }
+    
+    private void UpdateUI()
+    {
+        _healthText.text = "Health : " + _health;
+
     }
 }
