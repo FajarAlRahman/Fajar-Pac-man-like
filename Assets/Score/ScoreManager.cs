@@ -27,10 +27,9 @@ public class ScoreManager : MonoBehaviour
         UpdateUI();
     }
 
-    public void Start()
+    // Update is called once per frame
+    void Update()
     {
-        _score = 0;
-        _maxScore = 0;
         UpdateUI();
     }
 }
